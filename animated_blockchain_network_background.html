@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Arbitrage Network Background</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01050a}
+  body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  .vignette{
+    position:fixed;inset:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 48% 48%,rgba(0,28,44,.10),transparent 42%),
+      radial-gradient(circle at 50% 50%,transparent 0 35%,rgba(0,0,0,.18) 68%,rgba(0,0,0,.72) 100%),
+      linear-gradient(90deg,rgba(0,0,0,.20),transparent 25%,transparent 75%,rgba(0,0,0,.25));
+  }
+  .hud{
+    position:fixed;left:20px;top:18px;z-index:5;pointer-events:none;
+    font:500 9px ui-monospace,SFMono-Regular,Menlo,monospace;
+    letter-spacing:.14em;text-transform:uppercase;color:rgba(143,180,194,.48)
+  }
+  .hud b{color:rgba(112,218,249,.72);font-weight:600}
+</style>
+</head>
+<body>
+<canvas id="network"></canvas>
+<div class="vignette"></div>
+<div class="hud"><b>SAGAR SWAMI'S AI ARBITRAGE ENGINE</b> / LIVE NETWORK TELEMETRY</div>
+
+<script>
+(() => {
+"use strict";
+
+const canvas = document.getElementById("network");
+const ctx = canvas.getContext("2d", {alpha:false});
+let W=0,H=0,DPR=1,t=0;
+
+const TAU=Math.PI*2;
+const rand=(a,b)=>a+Math.random()*(b-a);
+
+function resize(){
+  W=innerWidth; H=innerHeight;
+  DPR=Math.min(devicePixelRatio||1,2);
+  canvas.width=Math.floor(W*DPR);
+  canvas.height=Math.floor(H*DPR);
+  canvas.style.width=W+"px";
+  canvas.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener("resize",resize,{passive:true});
+resize();
+
+/* -----------------------------
+   3D-ish blockchain lattice
+   ----------------------------- */
+const nodes=[];
+const NODE_COUNT=Math.min(125, Math.floor((W*H)/12000));
+
+for(let i=0;i<NODE_COUNT;i++){
+  nodes.push({
+    x:rand(-1,1),
+    y:rand(-1,1),
+    z:rand(.15,1),
+    driftX:rand(-.00013,.00013),
+    driftY:rand(-.00011,.00011),
+    pulse:rand(0,TAU),
+    size:rand(.65,2.0),
+    square:Math.random()<.24
+  });
+}
+
+/* deeper particles */
+const particles=Array.from({length:260},()=>({
+  x:rand(0,1),y:rand(0,1),r:rand(.25,1.6),a:rand(.08,.4),
+  p:rand(0,TAU),speed:rand(.00004,.00018)
+}));
+
+/* data packets */
+const packets=Array.from({length:38},()=>({
+  a:Math.floor(Math.random()*NODE_COUNT),
+  b:Math.floor(Math.random()*NODE_COUNT),
+  p:Math.random(),
+  speed:rand(.002,.007),
+  green:Math.random()<.12
+}));
+
+/* background telemetry that fades in/out */
+const telemetry=[
+  ["PROFIT","+ $842.18"],
+  ["BLOCK","23,841,772"],
+  ["ETH","$3,421.82"],
+  ["BNB","$641.17"],
+  ["BTC","$112,804"],
+  ["USDT","$1.0001"],
+  ["SPREAD","+0.42%"],
+  ["GAS","1.8 GWEI"],
+  ["LIQUIDITY","$18.4M"],
+  ["TVL","$2.81B"],
+  ["QUOTE","LIVE"],
+  ["RPC","42ms"],
+  ["DEX","UNISWAP → PANCAKE"],
+  ["ROUTE","ETH → USDT → ETH"],
+  ["ARBITRAGE","OPPORTUNITY FOUND"],
+  ["Jai Shree Ram","॥ जय श्री राम ॥"],
+  ["CRYPTO","ON-CHAIN DATA"],
+  ["AI ENGINE","SCANNING"]
+];
+
+const textEls=telemetry.map((d,i)=>{
+  const el=document.createElement("div");
+  el.style.position="fixed";
+  el.style.zIndex="3";
+  el.style.pointerEvents="none";
+  el.style.whiteSpace="nowrap";
+  el.style.font="500 10px ui-monospace,SFMono-Regular,Menlo,monospace";
+  el.style.letterSpacing=".055em";
+  el.style.color="rgba(139,190,207,.46)";
+  el.style.textShadow="0 0 12px rgba(74,199,241,.20)";
+  el.textContent=d[0]+"  "+d[1];
+  document.body.appendChild(el);
+  return {
+    el,
+    x:rand(.05,.95),
+    y:rand(.08,.92),
+    p:rand(0,TAU),
+    speed:rand(.00045,.0012),
+    life:rand(0,TAU),
+    scale:rand(.82,1.25),
+    i
+  };
+});
+
+function project(n){
+  // Center-weighted pseudo perspective
+  const perspective=0.64+n.z*.52;
+  return {
+    x:W*.5+n.x*(W*.52)/perspective,
+    y:H*.5+n.y*(H*.50)/perspective,
+    s:1/perspective
+  };
+}
+
+function line(a,b,alpha,width,color){
+  ctx.strokeStyle=color+alpha+")";
+  ctx.lineWidth=width;
+  ctx.beginPath();
+  ctx.moveTo(a.x,a.y);
+  ctx.lineTo(b.x,b.y);
+  ctx.stroke();
+}
+
+function background(){
+  ctx.fillStyle="#01050a";
+  ctx.fillRect(0,0,W,H);
+
+  // faint atmospheric blue haze
+  const g=ctx.createRadialGradient(W*.50,H*.48,0,W*.50,H*.48,Math.min(W,H)*.65);
+  g.addColorStop(0,"rgba(0,48,72,.20)");
+  g.addColorStop(.48,"rgba(0,24,39,.08)");
+  g.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,W,H);
+
+  for(const p of particles){
+    p.y-=p.speed;
+    if(p.y<0)p.y=1;
+    const tw=.45+.55*Math.sin(t*.002+p.p);
+    ctx.globalAlpha=p.a*tw;
+    ctx.fillStyle="#8bb7c6";
+    ctx.beginPath();
+    ctx.arc(p.x*W,p.y*H,p.r,0,TAU);
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+
+function drawNetwork(){
+  const projected=nodes.map(project);
+
+  // Connections: nearest visible neighbors, creating the exact "web/lattice" feel.
+  for(let i=0;i<nodes.length;i++){
+    let links=[];
+    for(let j=0;j<nodes.length;j++){
+      if(i===j)continue;
+      const a=projected[i],b=projected[j];
+      const dx=a.x-b.x,dy=a.y-b.y;
+      const d=Math.hypot(dx,dy);
+      if(d<Math.min(W,H)*.17) links.push([d,j]);
+    }
+    links.sort((a,b)=>a[0]-b[0]);
+    for(let k=0;k<Math.min(3,links.length);k++){
+      const j=links[k][1];
+      const depth=(nodes[i].z+nodes[j].z)/2;
+      const alpha=.035+.12*depth;
+      line(projected[i],projected[j],alpha,.55,"rgba(45,157,211,");
+    }
+  }
+
+  // Occasional long structural lines, like the uploaded reference.
+  for(let i=0;i<18;i++){
+    const a=Math.floor((i*17+t*.002)%nodes.length);
+    const b=(a+Math.floor(8+Math.sin(i)*12)+nodes.length)%nodes.length;
+    line(projected[a],projected[b],.08,.75,"rgba(54,169,224,");
+  }
+
+  // Nodes
+  nodes.forEach((n,i)=>{
+    n.x+=n.driftX;
+    n.y+=n.driftY;
+    if(n.x>1.08)n.x=-1.08;
+    if(n.x<-1.08)n.x=1.08;
+    if(n.y>1.08)n.y=-1.08;
+    if(n.y<-1.08)n.y=1.08;
+
+    const p=project(n);
+    const pulse=.5+.5*Math.sin(t*.003+n.pulse);
+
+    ctx.globalAlpha=.30+.52*pulse;
+    ctx.fillStyle="#8fe5ff";
+    ctx.shadowBlur=10;
+    ctx.shadowColor="rgba(61,193,241,.85)";
+
+    if(n.square){
+      const s=(2.5+2.0*pulse)*p.s;
+      ctx.fillRect(p.x-s,p.y-s,s*2,s*2);
+    }else{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,(1.1+.9*pulse)*p.s,0,TAU);
+      ctx.fill();
+    }
+    ctx.shadowBlur=0;
+  });
+  ctx.globalAlpha=1;
+
+  // Moving data packets over lines
+  packets.forEach(packet=>{
+    const a=projected[packet.a],b=projected[packet.b];
+    packet.p+=packet.speed;
+    if(packet.p>1){
+      packet.p=0;
+      packet.a=Math.floor(Math.random()*NODE_COUNT);
+      packet.b=Math.floor(Math.random()*NODE_COUNT);
+    }
+    const q=packet.p;
+    const px=a.x+(b.x-a.x)*q;
+    const py=a.y+(b.y-a.y)*q;
+
+    const color=packet.green?"#83e6ac":"#75dcff";
+    ctx.fillStyle=color;
+    ctx.shadowBlur=13;
+    ctx.shadowColor=color;
+    ctx.beginPath();
+    ctx.arc(px,py,1.5,0,TAU);
+    ctx.fill();
+    ctx.shadowBlur=0;
+  });
+}
+
+function drawText(){
+  textEls.forEach((d,i)=>{
+    d.p+=d.speed;
+    const wave=Math.sin(d.p+d.i*.9);
+
+    // Keep the strongest density around the sides and upper/background,
+    // leaving the center comparatively clean for dashboard UI.
+    const baseX=d.x*W;
+    const baseY=d.y*H + wave*10;
+
+    const fade=.14+.42*(.5+.5*Math.sin(d.life+d.p*2.2));
+    const centerDist=Math.abs(baseX-W*.50)/(W*.50);
+    const cleanFactor=.45+.55*Math.min(1,centerDist*1.8);
+    const opacity=fade*cleanFactor;
+
+    d.el.style.left=baseX+"px";
+    d.el.style.top=baseY+"px";
+    d.el.style.opacity=opacity.toFixed(3);
+    d.el.style.transform=`translate(-50%,-50%) scale(${d.scale})`;
+
+    // Make important financial values slightly brighter.
+    if(i===0||i===6||i===14){
+      d.el.style.color="rgba(112,225,177,"+(opacity*.95)+")";
+    }else if(i===15){
+      d.el.style.color="rgba(255,184,76,"+(opacity*.9)+")";
+    }else{
+      d.el.style.color="rgba(139,190,207,"+(opacity*.85)+")";
+    }
+  });
+}
+
+function frame(){
+  t++;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  background();
+  drawNetwork();
+  drawText();
+  requestAnimationFrame(frame);
+}
+frame();
+
+})();
+</script>
+</body>
+</html>

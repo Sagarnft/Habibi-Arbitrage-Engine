@@ -1,0 +1,290 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-04T23:00:14.604Z",
+  "recoveryTickets": [],
+  "recoveryHistory": [],
+  "settlementRecords": [],
+  "settlementQueue": [],
+  "rolloutGovernance": [
+    {
+      "chain": "arbitrum",
+      "currentStage": "scale",
+      "promotionStreak": 0,
+      "lastTransitionAt": 1788562814594,
+      "reason": "Manual override enforced at scale.",
+      "manualOverrideStage": "scale"
+    },
+    {
+      "chain": "ethereum",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "bnb",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "base",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "polygon",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "optimism",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "avalanche",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "fantom",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "celo",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "mantle",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "blast",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "linea",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "scroll",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "zksync",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "mode",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "sei",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "manta",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "ronin",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "swell",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "taiko",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "worldchain",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "berachain",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "sonic",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    },
+    {
+      "chain": "coredao",
+      "currentStage": "blocked",
+      "promotionStreak": 0,
+      "reason": "Observed stage matches current stage."
+    }
+  ],
+  "readinessGateHistory": [
+    {
+      "generatedAt": "2026-09-04T23:00:14.595Z",
+      "pass": true,
+      "reason": "Execution readiness gate is advisory-only (enforcement disabled)."
+    },
+    {
+      "generatedAt": "2026-09-03T02:21:21.618Z",
+      "pass": false,
+      "reason": "Execution readiness gate blocked: signer policy is not ready."
+    },
+    {
+      "generatedAt": "2026-09-03T02:21:21.617Z",
+      "pass": false,
+      "reason": "Execution readiness gate blocked by canary policy: Canary hold"
+    },
+    {
+      "generatedAt": "2026-09-03T02:21:21.617Z",
+      "pass": true,
+      "reason": "Execution readiness gate is advisory-only (enforcement disabled)."
+    },
+    {
+      "generatedAt": "2026-09-03T02:21:21.018Z",
+      "pass": false,
+      "reason": "Execution readiness gate blocked by canary policy: hold"
+    },
+    {
+      "generatedAt": "2026-09-03T02:21:21.018Z",
+      "pass": true,
+      "reason": "Execution readiness gate passed."
+    }
+  ],
+  "alertHistory": [
+    {
+      "id": "alert-ade54238-2452-4af4-b33d-29384743e475",
+      "event": "kill-switch",
+      "message": "Kill-switch engaged for testing",
+      "timestamp": "2026-09-03T14:49:40.024Z",
+      "severity": "critical",
+      "delivered": true,
+      "reason": "Delivered",
+      "responseAction": "pause-execution-and-review-losses",
+      "acknowledged": true,
+      "acknowledgedAt": "2026-09-03T14:49:40.025Z",
+      "acknowledgedBy": "test-operator",
+      "payload": {
+        "reason": "Kill-switch engaged due to daily realized loss cap breach"
+      },
+      "status": "acknowledged"
+    },
+    {
+      "id": "alert-66ae4045-d349-416b-b0b6-9a10f9e1437e",
+      "event": "kill-switch",
+      "message": "Kill-switch engaged for testing",
+      "timestamp": "2026-09-03T14:49:26.692Z",
+      "severity": "critical",
+      "delivered": true,
+      "reason": "Delivered",
+      "responseAction": "pause-execution-and-review-losses",
+      "acknowledged": true,
+      "acknowledgedAt": "2026-09-03T14:49:26.692Z",
+      "acknowledgedBy": "test-operator",
+      "payload": {
+        "reason": "Kill-switch engaged due to daily realized loss cap breach"
+      },
+      "status": "acknowledged"
+    },
+    {
+      "id": "alert-1630c4ff-b000-4478-a0c8-06b3c28881b4",
+      "event": "kill-switch",
+      "message": "Kill-switch engaged for testing",
+      "timestamp": "2026-09-03T14:48:43.803Z",
+      "severity": "critical",
+      "delivered": true,
+      "reason": "Delivered",
+      "responseAction": "pause-execution-and-review-losses",
+      "acknowledged": true,
+      "acknowledgedAt": "2026-09-03T14:48:43.804Z",
+      "acknowledgedBy": "test-operator",
+      "payload": {
+        "reason": "Kill-switch engaged due to daily realized loss cap breach"
+      },
+      "status": "acknowledged"
+    },
+    {
+      "id": "alert-a3a38646-0c16-460b-a6d1-33a8ceb578be",
+      "event": "kill-switch",
+      "message": "Kill-switch engaged for testing",
+      "timestamp": "2026-09-03T14:44:38.471Z",
+      "severity": "critical",
+      "delivered": true,
+      "reason": "Delivered",
+      "responseAction": "pause-execution-and-review-losses",
+      "acknowledged": true,
+      "acknowledgedAt": "2026-09-03T14:44:38.472Z",
+      "acknowledgedBy": "test-operator",
+      "payload": {
+        "reason": "Kill-switch engaged due to daily realized loss cap breach"
+      },
+      "status": "acknowledged"
+    },
+    {
+      "id": "alert-386e1544-4aa4-4ab1-89c0-874b90591adf",
+      "event": "kill-switch",
+      "message": "Kill-switch engaged for testing",
+      "timestamp": "2026-09-03T14:44:22.680Z",
+      "severity": "critical",
+      "delivered": true,
+      "reason": "Delivered",
+      "responseAction": "pause-execution-and-review-losses",
+      "acknowledged": false,
+      "payload": {
+        "reason": "Kill-switch engaged due to daily realized loss cap breach"
+      },
+      "status": "delivered"
+    },
+    {
+      "id": "alert-d7be3a05-e532-4b77-8dd3-6893af37ddc2",
+      "event": "kill-switch",
+      "message": "Kill-switch engaged for testing",
+      "timestamp": "2026-09-03T02:46:21.763Z",
+      "severity": "critical",
+      "delivered": true,
+      "reason": "Delivered",
+      "responseAction": "pause-execution-and-review-losses",
+      "acknowledged": true,
+      "acknowledgedAt": "2026-09-03T02:46:21.764Z",
+      "acknowledgedBy": "test-operator",
+      "payload": {
+        "reason": "Kill-switch engaged due to daily realized loss cap breach"
+      },
+      "status": "acknowledged"
+    }
+  ]
+}

@@ -1,0 +1,1821 @@
+const DEFAULT_LAST_SCAN = "1970-01-01T00:00:00.000Z";
+
+export interface DashboardSnapshot {
+  status: string;
+  chain: string;
+  tokens: number;
+  pairsScanned: number;
+  opportunities: number;
+  bestProfit: string;
+  bestRoute: string;
+  bestOpportunity?: {
+    pair: string;
+    buyDex: string;
+    sellDex: string;
+    profit: string;
+    confidence: string;
+    chain?: string;
+    category?: string;
+  };
+  topRoute?: {
+    pair: string;
+    buyDex: string;
+    sellDex: string;
+    profit: string;
+    coverage: string;
+    chain?: string;
+    category?: string;
+  };
+  lastScan: string;
+  health?: {
+    total: number;
+    healthy: number;
+    offline: number;
+    overall: string;
+  };
+  risk?: {
+    approved: boolean;
+    level: string;
+    score: number;
+    reason?: string;
+  };
+  protection?: {
+    allowed: boolean;
+    score: number;
+    reason?: string;
+  };
+  rpcHealth?: Array<{
+    chain: string;
+    selectedUrl?: string;
+    latestBlock?: number;
+    total: number;
+    healthy: number;
+    offline: number;
+    overall: string;
+    endpoints: Array<{
+      url: string;
+      selected: boolean;
+      inCooldown: boolean;
+      failures: number;
+      successes: number;
+      cooldownUntil: number;
+      lastLatency?: number;
+      lastUsedAt?: number;
+    }>;
+  }>;
+  opportunitiesFeed?: Array<{
+    pair: string;
+    buyDex: string;
+    sellDex: string;
+    diff: string;
+    profit: string;
+    gas: string;
+    net: string;
+    confidence: string;
+    slippage?: string;
+    gasImpact?: string;
+    liquidity?: string;
+    reasons?: string[];
+    chain?: string;
+    category?: string;
+  }>;
+  dexAnalytics?: Array<{
+    name: string;
+    liquidity: string;
+    volume: string;
+    routes: number;
+    performance: string;
+  }>;
+  executionReadiness?: {
+    readyPairs: number;
+    pendingPairs: number;
+    coverage: string;
+    perDex?: Array<{
+      dex: string;
+      ready: number;
+      pending: number;
+      coverage: string;
+    }>;
+    pairs?: Array<{
+      id: string;
+      dex: string;
+      chain: string;
+      status: string;
+      version?: string;
+      router?: string;
+      factory?: string;
+      reason?: string;
+      category?: string;
+      coverageHint?: string;
+    }>;
+  };
+  tradeHistory?: Array<{
+    id: string;
+    pair: string;
+    route: string;
+    executedAt: string;
+    sizeUsd: string;
+    pnl: string;
+    status: string;
+    txHash?: string;
+    note?: string;
+  }>;
+  executionIntents?: Array<{
+    id: string;
+    chain: string;
+    walletAddress: string;
+    route: string;
+    amountUsd: string;
+    createdAt: string;
+    expiresAt: string;
+    status: string;
+    privateRelayRequested?: boolean;
+    privateRelayRequired?: boolean;
+    relayHashes?: string[];
+    txHash?: string;
+  }>;
+  executionIntentSummary?: {
+    total: number;
+    prepared: number;
+    submitted: number;
+    confirmed: number;
+    failed: number;
+    active: number;
+  };
+  pnlSummary?: {
+    totalPnl: string;
+    winRate: string;
+    totalVolume: string;
+    bestTrade: string;
+  };
+  quoteHealth?: Array<{
+    dex: string;
+    dexId: string;
+    chain: string;
+    protocol: string;
+    priceSource: string;
+    quoteSource: string;
+    status: string;
+    source: string;
+    lastSuccessfulFetch?: string;
+    quoteAgeMs?: number;
+    blockNumber?: number;
+    blockAge?: number;
+    poolAddress?: string;
+    liquidity?: string;
+    error?: string;
+    latencyMs?: number;
+  }>;
+  dexSupportMatrix?: Array<{
+    dex: string;
+    chain: string;
+    protocol: string;
+    priceSource: string;
+    quoteSource: string;
+    status: string;
+    lastSuccessfulQuote?: string;
+  }>;
+  tokenMonitoring?: Array<{
+    symbol: string;
+    price: string;
+    liquidity: string;
+    volume: string;
+    risk: string;
+  }>;
+  aiMetrics?: Array<{
+    label: string;
+    value: string;
+  }>;
+  executionPlan?: Array<{
+    label: string;
+    detail: string;
+    status: string;
+  }>;
+  transactions?: Array<{
+    status: string;
+    hash: string;
+    gasUsed: string;
+  }>;
+  signerPolicy?: {
+    mode: string;
+    ready: boolean;
+    production: boolean;
+    usingServerKey: boolean;
+    kmsConfigured: boolean;
+    reason: string;
+  };
+  capitalPolicy?: {
+    activeAllocationShare: number;
+    reserveAllocationShare: number;
+    emergencyAllocationShare: number;
+    emergencyReserveFloorUsd: number;
+    maxTradeShareOfActiveCapital: number;
+    minGasReserveNative: Record<string, number>;
+  };
+  capitalGrowth?: {
+    status: "paused" | "cooldown" | "conservative" | "growing";
+    currentActiveShare: number;
+    recommendedActiveShare: number;
+    deltaActiveShare: number;
+    winRatePct: number;
+    drawdownPct: number;
+    realizedNetUsd: number;
+    decisionScore: number;
+    allowed: boolean;
+    reason: string;
+    nextReviewAt: string;
+  };
+  marketValidation?: {
+    status: "hold" | "watch" | "ready";
+    allowed: boolean;
+    score: number;
+    liveOpportunityRatio: number;
+    avgExpectedNetUsd: number;
+    rpcHealthyRatio: number;
+    reason: string;
+  };
+  canaryValidation?: {
+    chain: string;
+    windowHours: number;
+    minSettledTrades: number;
+    minRealizedNetUsd: number;
+    maxAverageSlippageBps: number;
+    maxLossTrades: number;
+    settledTrades: number;
+    lossTrades: number;
+    cumulativeRealizedNetUsd: number;
+    averageSlippageBps: number;
+    goForScale: boolean;
+    reason: string;
+    latestSettledAt?: string;
+  };
+  relayRpcDrill?: {
+    generatedAt: string;
+    relay: {
+      requiredChains: string[];
+      configuredChains: string[];
+      missingChains: string[];
+      pass: boolean;
+    };
+    rpc: {
+      totalChains: number;
+      degradedOrOfflineChains: string[];
+      lowRedundancyChains: string[];
+      pass: boolean;
+    };
+    failClosed: {
+      apiKeyConfigured: boolean;
+      unsafeBypassEnabled: boolean;
+      signerReady: boolean;
+      pass: boolean;
+    };
+    alerts: {
+      webhookConfigured: boolean;
+      pass: boolean;
+    };
+    workers: {
+      recoveryEnabled: boolean;
+      settlementEnabled: boolean;
+      pass: boolean;
+    };
+    overallPass: boolean;
+    reason: string;
+  };
+  liveCostTuning?: {
+    windowTrades: number;
+    avgGasCostUsd: number;
+    avgSlippageBps: number;
+    avgRealizedNetUsd: number;
+    gasCostBufferUsd: number;
+    slippageMultiplier: number;
+    sizingPenaltyMultiplier: number;
+    reason: string;
+  };
+  readinessGate?: {
+    generatedAt: string;
+    enforced: {
+      canaryPassRequired: boolean;
+      relayRpcDrillPassRequired: boolean;
+    };
+    checks: {
+      killSwitchClear: boolean;
+      signerReady: boolean;
+      canaryPass: boolean;
+      relayRpcDrillPass: boolean;
+    };
+    pass: boolean;
+    reason: string;
+  };
+  readinessGateHistory?: Array<{
+    generatedAt: string;
+    pass: boolean;
+    reason: string;
+  }>;
+  operatorSafety?: {
+    generatedAt: string;
+    persistence: {
+      filePath: string;
+      exists: boolean;
+      healthy: boolean;
+      sizeBytes: number;
+      lastModifiedAt?: string;
+    };
+    alerting: {
+      webhookConfigured: boolean;
+      pass: boolean;
+    };
+    risk: {
+      killSwitchEngaged: boolean;
+      readinessGatePass: boolean;
+      canaryPass: boolean;
+      relayRpcDrillPass: boolean;
+      pass: boolean;
+    };
+    overallPass: boolean;
+    reason: string;
+  };
+  alerting?: {
+    webhookConfigured: boolean;
+    unresolvedCritical: number;
+    recent: Array<{
+      id: string;
+      event: string;
+      message: string;
+      timestamp: string;
+      severity: "info" | "warning" | "critical";
+      delivered: boolean;
+      reason: string;
+      responseAction: string;
+      acknowledged: boolean;
+      acknowledgedAt?: string;
+      acknowledgedBy?: string;
+      status: "delivered" | "failed" | "acknowledged";
+    }>;
+    recommendedActions: string[];
+    lastDeliveredAt?: string;
+    lastFailedAt?: string;
+  };
+  deploymentSafety?: {
+    generatedAt: string;
+    process: {
+      pid: number;
+      uptimeSeconds: number;
+      startedAt: string;
+      nodeVersion: string;
+    };
+    persistence: {
+      filePath: string;
+      exists: boolean;
+      healthy: boolean;
+      sizeBytes: number;
+      lastModifiedAt?: string;
+    };
+    workers: {
+      recovery: {
+        enabled: boolean;
+        inFlight: boolean;
+        pending: number;
+        retryReady: number;
+      };
+      settlement: {
+        enabled: boolean;
+        inFlight: boolean;
+        pending: number;
+        retryReady: number;
+      };
+    };
+    alerts: {
+      webhookConfigured: boolean;
+    };
+    restart: {
+      safeToRestart: boolean;
+      blockers: string[];
+      reason: string;
+    };
+  };
+  reconciliation?: {
+    generatedAt: string;
+    matched: number;
+    pending: number;
+    orphanSettlements: number;
+    recentIssues: Array<{
+      type: "missing-settlement" | "orphan-settlement";
+      txHash: string;
+      chain?: string;
+      note: string;
+    }>;
+    reason: string;
+  };
+  opsMetricsGeneratedAt?: string;
+  killSwitch?: {
+    engaged: boolean;
+    reason?: string;
+    engagedAt?: string;
+    consecutiveLosses: number;
+    abnormalSlippageEvents: number;
+    rpcInstabilityEvents: number;
+    dailyRealizedLossUsd: number;
+  };
+  replay?: {
+    windowMinutes: number;
+    scanned: number;
+    executable: number;
+    avgExpectedNetUsd: number;
+  };
+  rpc?: {
+    degradedOrOfflineChains?: string[];
+  };
+  persistence?: {
+    storePath?: string;
+  };
+  recoveryWorker?: {
+    enabled: boolean;
+    inFlight: boolean;
+    intervalMs: number;
+    maxAttempts: number;
+    baseBackoffMs: number;
+    maxBackoffMs: number;
+    defaultSlippageBps: number;
+    pending: number;
+    retryReady: number;
+    lastRunAt?: string;
+  };
+  settlementWorker?: {
+    enabled: boolean;
+    inFlight: boolean;
+    intervalMs: number;
+    maxAttempts: number;
+    baseBackoffMs: number;
+    maxBackoffMs: number;
+    minProfitBps: number;
+    pending: number;
+    retryReady: number;
+    lastRunAt?: string;
+  };
+  settlementQueue?: {
+    pending: number;
+    settled: number;
+    failed: number;
+    items?: Array<{
+      id: string;
+      txHash: string;
+      chain: string;
+      walletAddress: string;
+      amountUsd: string;
+      pair?: string;
+      route?: string;
+      status: string;
+      attempts: number;
+      createdAt: string;
+      lastAttemptAt?: string;
+      nextRetryAt?: string;
+      lastError?: string;
+      settledAt?: string;
+    }>;
+  };
+  settlements?: {
+    count: number;
+    latest?: {
+      txHash: string;
+      chain: string;
+      walletAddress: string;
+      amountUsd: string;
+      pair?: string;
+      route?: string;
+      realizedNetUsd: string;
+      spreadGainUsd: string;
+      gasCostUsd: string;
+      slippageCostUsd: string;
+      settledAt: string;
+      note?: string;
+    };
+  };
+  rollout?: {
+    summary?: {
+      blocked: number;
+      canary: number;
+      scale: number;
+    };
+    governance?: {
+      autopilotEnabled: boolean;
+      promotionStreakRequired: number;
+      promotionCooldownMs: number;
+      demotionCooldownMs: number;
+    };
+    chains?: Array<{
+      chain: string;
+      stage: string;
+      observedStage?: string;
+      rpcOverall: string;
+      executablePairs?: {
+        ready: number;
+        total: number;
+        coveragePct: number;
+      };
+      quoteHealth?: {
+        degradedOrOffline: number;
+      };
+      canaryValidation?: {
+        chain: string;
+        windowHours: number;
+        minSettledTrades: number;
+        minRealizedNetUsd: number;
+        maxAverageSlippageBps: number;
+        maxLossTrades: number;
+        settledTrades: number;
+        lossTrades: number;
+        cumulativeRealizedNetUsd: number;
+        averageSlippageBps: number;
+        goForScale: boolean;
+        reason: string;
+        latestSettledAt?: string;
+      };
+      readinessGate?: {
+        generatedAt: string;
+        enforced: {
+          canaryPassRequired: boolean;
+          relayRpcDrillPassRequired: boolean;
+        };
+        checks: {
+          killSwitchClear: boolean;
+          signerReady: boolean;
+          canaryPass: boolean;
+          relayRpcDrillPass: boolean;
+        };
+        pass: boolean;
+        reason: string;
+      };
+      operatorSafety?: {
+        generatedAt: string;
+        persistence: {
+          filePath: string;
+          exists: boolean;
+          healthy: boolean;
+          sizeBytes: number;
+          lastModifiedAt?: string;
+        };
+        alerting: {
+          webhookConfigured: boolean;
+          pass: boolean;
+        };
+        risk: {
+          killSwitchEngaged: boolean;
+          readinessGatePass: boolean;
+          canaryPass: boolean;
+          relayRpcDrillPass: boolean;
+          pass: boolean;
+        };
+        overallPass: boolean;
+        reason: string;
+      };
+      goNoGo?: {
+        chain: string;
+        observedStage: string;
+        recommendedStage: string;
+        readyForCanary: boolean;
+        readyForScale: boolean;
+        checks: {
+          readinessGatePass: boolean;
+          relayRpcDrillPass: boolean;
+          operatorSafetyPass: boolean;
+          canaryValidationPass: boolean;
+        };
+        reason: string;
+      };
+      governance?: {
+        source?: string;
+        promotionStreak?: number;
+        holdUntil?: string;
+        lastTransitionAt?: string;
+        manualOverrideStage?: string;
+      };
+      reason?: string;
+    }>;
+  };
+  chartSummary?: {
+    profitHistory: number[];
+    gasBars: number[];
+    successRate: string;
+    opportunityTimeline: string;
+  };
+}
+
+export function createDefaultDashboardSnapshot(): DashboardSnapshot {
+  return {
+    status: "idle",
+    chain: "arbitrum",
+    tokens: 0,
+    pairsScanned: 0,
+    opportunities: 0,
+    bestProfit: "$0",
+    bestRoute: "No opportunity",
+    lastScan: DEFAULT_LAST_SCAN,
+    health: {
+      total: 0,
+      healthy: 0,
+      offline: 0,
+      overall: "offline",
+    },
+    risk: {
+      approved: false,
+      level: "unverified",
+      score: 0,
+      reason: "No live opportunity detected",
+    },
+    protection: {
+      allowed: false,
+      score: 0,
+      reason: "No live opportunity detected",
+    },
+    rpcHealth: [],
+    opportunitiesFeed: [],
+    dexAnalytics: [],
+    executionReadiness: {
+      readyPairs: 0,
+      pendingPairs: 0,
+      coverage: "0%",
+      perDex: [],
+      pairs: [],
+    },
+    tradeHistory: [],
+    executionIntents: [],
+    executionIntentSummary: {
+      total: 0,
+      prepared: 0,
+      submitted: 0,
+      confirmed: 0,
+      failed: 0,
+      active: 0,
+    },
+    pnlSummary: {
+      totalPnl: "$0",
+      winRate: "0%",
+      totalVolume: "$0",
+      bestTrade: "$0",
+    },
+    tokenMonitoring: [],
+    aiMetrics: [],
+    signerPolicy: {
+      mode: "wallet-external",
+      ready: true,
+      production: false,
+      usingServerKey: false,
+      kmsConfigured: false,
+      reason: "External wallet signer mode is active.",
+    },
+    capitalPolicy: {
+      activeAllocationShare: 0.6,
+      reserveAllocationShare: 0.25,
+      emergencyAllocationShare: 0.15,
+      emergencyReserveFloorUsd: 150,
+      maxTradeShareOfActiveCapital: 0.35,
+      minGasReserveNative: {},
+    },
+    capitalGrowth: {
+      status: "conservative",
+      currentActiveShare: 0.6,
+      recommendedActiveShare: 0.6,
+      deltaActiveShare: 0,
+      winRatePct: 55,
+      drawdownPct: 0,
+      realizedNetUsd: 0,
+      decisionScore: 0.7,
+      allowed: true,
+      reason: "Capital growth is conservative until a clean performance streak is sustained.",
+      nextReviewAt: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
+    },
+    marketValidation: {
+      status: "watch",
+      allowed: true,
+      score: 0.6,
+      liveOpportunityRatio: 0.05,
+      avgExpectedNetUsd: 0,
+      rpcHealthyRatio: 1,
+      reason: "The engine is running but live market validation is still being proven.",
+    },
+    canaryValidation: {
+      chain: "arbitrum",
+      windowHours: 24,
+      minSettledTrades: 3,
+      minRealizedNetUsd: 1,
+      maxAverageSlippageBps: 35,
+      maxLossTrades: 1,
+      settledTrades: 0,
+      lossTrades: 0,
+      cumulativeRealizedNetUsd: 0,
+      averageSlippageBps: 0,
+      goForScale: false,
+      reason: "No canary validation data yet.",
+      latestSettledAt: undefined,
+    },
+    relayRpcDrill: {
+      generatedAt: new Date().toISOString(),
+      relay: {
+        requiredChains: [],
+        configuredChains: [],
+        missingChains: [],
+        pass: false,
+      },
+      rpc: {
+        totalChains: 0,
+        degradedOrOfflineChains: [],
+        lowRedundancyChains: [],
+        pass: false,
+      },
+      failClosed: {
+        apiKeyConfigured: false,
+        unsafeBypassEnabled: false,
+        signerReady: true,
+        pass: false,
+      },
+      alerts: {
+        webhookConfigured: false,
+        pass: false,
+      },
+      workers: {
+        recoveryEnabled: false,
+        settlementEnabled: false,
+        pass: false,
+      },
+      overallPass: false,
+      reason: "Relay/RPC drill has not run yet.",
+    },
+    liveCostTuning: {
+      windowTrades: 0,
+      avgGasCostUsd: 0,
+      avgSlippageBps: 0,
+      avgRealizedNetUsd: 0,
+      gasCostBufferUsd: 0,
+      slippageMultiplier: 1,
+      sizingPenaltyMultiplier: 1,
+      reason: "No settled trades yet; live cost tuning is neutral.",
+    },
+    readinessGate: {
+      generatedAt: new Date().toISOString(),
+      enforced: {
+        canaryPassRequired: false,
+        relayRpcDrillPassRequired: false,
+      },
+      checks: {
+        killSwitchClear: true,
+        signerReady: true,
+        canaryPass: false,
+        relayRpcDrillPass: false,
+      },
+      pass: true,
+      reason: "Execution readiness gate is advisory-only (enforcement disabled).",
+    },
+    readinessGateHistory: [],
+    operatorSafety: {
+      generatedAt: new Date().toISOString(),
+      persistence: {
+        filePath: "",
+        exists: false,
+        healthy: false,
+        sizeBytes: 0,
+        lastModifiedAt: undefined,
+      },
+      alerting: {
+        webhookConfigured: false,
+        pass: false,
+      },
+      risk: {
+        killSwitchEngaged: false,
+        readinessGatePass: true,
+        canaryPass: false,
+        relayRpcDrillPass: false,
+        pass: false,
+      },
+      overallPass: false,
+      reason: "Operator safety snapshot has not run yet.",
+    },
+    alerting: {
+      webhookConfigured: false,
+      unresolvedCritical: 0,
+      recent: [],
+      recommendedActions: [],
+    },
+    deploymentSafety: {
+      generatedAt: new Date().toISOString(),
+      process: {
+        pid: 0,
+        uptimeSeconds: 0,
+        startedAt: new Date().toISOString(),
+        nodeVersion: "unknown",
+      },
+      persistence: {
+        filePath: "",
+        exists: false,
+        healthy: false,
+        sizeBytes: 0,
+        lastModifiedAt: undefined,
+      },
+      workers: {
+        recovery: {
+          enabled: false,
+          inFlight: false,
+          pending: 0,
+          retryReady: 0,
+        },
+        settlement: {
+          enabled: false,
+          inFlight: false,
+          pending: 0,
+          retryReady: 0,
+        },
+      },
+      alerts: {
+        webhookConfigured: false,
+      },
+      restart: {
+        safeToRestart: false,
+        blockers: [],
+        reason: "Deployment restart safety snapshot has not run yet.",
+      },
+    },
+    reconciliation: {
+      generatedAt: new Date().toISOString(),
+      matched: 0,
+      pending: 0,
+      orphanSettlements: 0,
+      recentIssues: [],
+      reason: "Post-trade reconciliation snapshot has not run yet.",
+    },
+    opsMetricsGeneratedAt: undefined,
+    killSwitch: {
+      engaged: false,
+      reason: undefined,
+      engagedAt: undefined,
+      consecutiveLosses: 0,
+      abnormalSlippageEvents: 0,
+      rpcInstabilityEvents: 0,
+      dailyRealizedLossUsd: 0,
+    },
+    replay: {
+      windowMinutes: 60,
+      scanned: 0,
+      executable: 0,
+      avgExpectedNetUsd: 0,
+    },
+    rpc: {
+      degradedOrOfflineChains: [],
+    },
+    persistence: {
+      storePath: undefined,
+    },
+    recoveryWorker: {
+      enabled: false,
+      inFlight: false,
+      intervalMs: 0,
+      maxAttempts: 0,
+      baseBackoffMs: 0,
+      maxBackoffMs: 0,
+      defaultSlippageBps: 0,
+      pending: 0,
+      retryReady: 0,
+      lastRunAt: undefined,
+    },
+    settlementWorker: {
+      enabled: false,
+      inFlight: false,
+      intervalMs: 0,
+      maxAttempts: 0,
+      baseBackoffMs: 0,
+      maxBackoffMs: 0,
+      minProfitBps: 0,
+      pending: 0,
+      retryReady: 0,
+      lastRunAt: undefined,
+    },
+    settlementQueue: {
+      pending: 0,
+      settled: 0,
+      failed: 0,
+      items: [],
+    },
+    settlements: {
+      count: 0,
+      latest: undefined,
+    },
+    rollout: {
+      summary: {
+        blocked: 0,
+        canary: 0,
+        scale: 0,
+      },
+      governance: {
+        autopilotEnabled: true,
+        promotionStreakRequired: 3,
+        promotionCooldownMs: 600000,
+        demotionCooldownMs: 180000,
+      },
+      chains: [],
+    },
+    chartSummary: {
+      profitHistory: [0, 0, 0, 0, 0, 0, 0, 0],
+      gasBars: [0, 0, 0, 0, 0, 0, 0, 0],
+      successRate: "0%",
+      opportunityTimeline: "0 active",
+    },
+    bestOpportunity: undefined,
+    topRoute: undefined,
+    transactions: [],
+  };
+}
+
+export function normalizeDashboardSnapshot(input: Partial<DashboardSnapshot> | null | undefined): DashboardSnapshot {
+  const source = input ?? {};
+  const opportunitiesFeed = Array.isArray(source.opportunitiesFeed)
+    ? source.opportunitiesFeed
+        .filter((row) => row && (typeof row.pair === "string" || typeof row.buyDex === "string" || typeof row.sellDex === "string"))
+        .map((row) => ({
+          pair: typeof row.pair === "string" ? row.pair : "",
+          buyDex: typeof row.buyDex === "string" ? row.buyDex : "",
+          sellDex: typeof row.sellDex === "string" ? row.sellDex : "",
+          diff: typeof row.diff === "string" ? row.diff : "0%",
+          profit: typeof row.profit === "string" ? row.profit : "$0",
+          gas: typeof row.gas === "string" ? row.gas : "$0",
+          net: typeof row.net === "string" ? row.net : "$0",
+          confidence: typeof row.confidence === "string" ? row.confidence : "0%",
+          slippage: typeof row.slippage === "string" ? row.slippage : undefined,
+          gasImpact: typeof row.gasImpact === "string" ? row.gasImpact : undefined,
+          liquidity: typeof row.liquidity === "string" ? row.liquidity : undefined,
+          reasons: Array.isArray(row.reasons) ? row.reasons.filter((reason): reason is string => typeof reason === "string") : undefined,
+          chain: typeof row.chain === "string" ? row.chain : undefined,
+          category: typeof row.category === "string" ? row.category : undefined,
+        }))
+    : [];
+
+  const hasRealOpportunity = opportunitiesFeed.some((row) => {
+    const profitValue = Number.parseFloat(String(row.profit ?? "").replace(/[^0-9.-]/g, ""));
+    const confidenceValue = Number.parseFloat(String(row.confidence ?? "").replace(/[^0-9.-]/g, ""));
+    return (Number.isFinite(profitValue) && profitValue > 0) || (Number.isFinite(confidenceValue) && confidenceValue > 0);
+  });
+
+  return {
+    status: typeof source.status === "string" && source.status.trim() ? source.status : "idle",
+    chain: typeof source.chain === "string" && source.chain.trim() ? source.chain : "arbitrum",
+    tokens: Number(source.tokens) || 0,
+    pairsScanned: Number(source.pairsScanned) || 0,
+    opportunities: hasRealOpportunity ? Number(source.opportunities) || opportunitiesFeed.length : 0,
+    bestProfit: typeof source.bestProfit === "string" && source.bestProfit.trim() ? source.bestProfit : (hasRealOpportunity ? opportunitiesFeed[0]?.profit ?? "$0" : "$0"),
+    bestRoute: typeof source.bestRoute === "string" && source.bestRoute.trim() ? source.bestRoute : (hasRealOpportunity ? opportunitiesFeed[0]?.pair ?? "No opportunity" : "No opportunity"),
+    bestOpportunity: source.bestOpportunity && (typeof source.bestOpportunity.pair === "string" || typeof source.bestOpportunity.buyDex === "string" || typeof source.bestOpportunity.sellDex === "string") ? {
+      pair: typeof source.bestOpportunity.pair === "string" ? source.bestOpportunity.pair : "",
+      buyDex: typeof source.bestOpportunity.buyDex === "string" ? source.bestOpportunity.buyDex : "",
+      sellDex: typeof source.bestOpportunity.sellDex === "string" ? source.bestOpportunity.sellDex : "",
+      profit: typeof source.bestOpportunity.profit === "string" ? source.bestOpportunity.profit : "$0",
+      confidence: typeof source.bestOpportunity.confidence === "string" ? source.bestOpportunity.confidence : "0%",
+      chain: typeof source.bestOpportunity.chain === "string" ? source.bestOpportunity.chain : undefined,
+      category: typeof source.bestOpportunity.category === "string" ? source.bestOpportunity.category : undefined,
+    } : (hasRealOpportunity ? {
+      pair: opportunitiesFeed[0]?.pair ?? "",
+      buyDex: opportunitiesFeed[0]?.buyDex ?? "",
+      sellDex: opportunitiesFeed[0]?.sellDex ?? "",
+      profit: opportunitiesFeed[0]?.profit ?? "$0",
+      confidence: opportunitiesFeed[0]?.confidence ?? "0%",
+      chain: opportunitiesFeed[0]?.chain,
+      category: opportunitiesFeed[0]?.category,
+    } : undefined),
+    topRoute: source.topRoute && (typeof source.topRoute.pair === "string" || typeof source.topRoute.buyDex === "string" || typeof source.topRoute.sellDex === "string") ? {
+      pair: typeof source.topRoute.pair === "string" ? source.topRoute.pair : "",
+      buyDex: typeof source.topRoute.buyDex === "string" ? source.topRoute.buyDex : "",
+      sellDex: typeof source.topRoute.sellDex === "string" ? source.topRoute.sellDex : "",
+      profit: typeof source.topRoute.profit === "string" ? source.topRoute.profit : "$0",
+      coverage: typeof source.topRoute.coverage === "string" ? source.topRoute.coverage : "0%",
+      chain: typeof source.topRoute.chain === "string" ? source.topRoute.chain : undefined,
+      category: typeof source.topRoute.category === "string" ? source.topRoute.category : undefined,
+    } : (hasRealOpportunity ? {
+      pair: opportunitiesFeed[0]?.pair ?? "",
+      buyDex: opportunitiesFeed[0]?.buyDex ?? "",
+      sellDex: opportunitiesFeed[0]?.sellDex ?? "",
+      profit: opportunitiesFeed[0]?.profit ?? "$0",
+      coverage: "0%",
+      chain: opportunitiesFeed[0]?.chain,
+      category: opportunitiesFeed[0]?.category,
+    } : undefined),
+    lastScan: typeof source.lastScan === "string" && source.lastScan.trim() ? source.lastScan : DEFAULT_LAST_SCAN,
+    health: source.health ? {
+      total: Number(source.health.total) || 0,
+      healthy: Number(source.health.healthy) || 0,
+      offline: Number(source.health.offline) || 0,
+      overall: typeof source.health.overall === "string" ? source.health.overall : "offline",
+    } : {
+      total: 0,
+      healthy: 0,
+      offline: 0,
+      overall: "offline",
+    },
+    risk: source.risk ? {
+      approved: Boolean(source.risk.approved),
+      level: typeof source.risk.level === "string" ? source.risk.level : "approved",
+      score: Number(source.risk.score) || 100,
+      reason: typeof source.risk.reason === "string" ? source.risk.reason : undefined,
+    } : {
+      approved: false,
+      level: "unverified",
+      score: 0,
+    },
+    protection: source.protection ? {
+      allowed: Boolean(source.protection.allowed),
+      score: Number(source.protection.score) || 100,
+      reason: typeof source.protection.reason === "string" ? source.protection.reason : undefined,
+    } : {
+      allowed: false,
+      score: 0,
+    },
+    rpcHealth: Array.isArray(source.rpcHealth) ? source.rpcHealth.map((chain) => ({
+      chain: typeof chain.chain === "string" ? chain.chain : "",
+      selectedUrl: typeof chain.selectedUrl === "string" ? chain.selectedUrl : undefined,
+      latestBlock: typeof chain.latestBlock === "number" ? chain.latestBlock : undefined,
+      total: Number(chain.total) || 0,
+      healthy: Number(chain.healthy) || 0,
+      offline: Number(chain.offline) || 0,
+      overall: typeof chain.overall === "string" ? chain.overall : "offline",
+      endpoints: Array.isArray(chain.endpoints) ? chain.endpoints.map((endpoint) => ({
+        url: typeof endpoint.url === "string" ? endpoint.url : "",
+        selected: Boolean(endpoint.selected),
+        inCooldown: Boolean(endpoint.inCooldown),
+        failures: Number(endpoint.failures) || 0,
+        successes: Number(endpoint.successes) || 0,
+        cooldownUntil: Number(endpoint.cooldownUntil) || 0,
+        lastLatency: typeof endpoint.lastLatency === "number" ? endpoint.lastLatency : undefined,
+        lastUsedAt: typeof endpoint.lastUsedAt === "number" ? endpoint.lastUsedAt : undefined,
+      })) : [],
+    })) : [],
+    opportunitiesFeed,
+    dexAnalytics: Array.isArray(source.dexAnalytics) ? source.dexAnalytics.map((dex) => ({
+      name: typeof dex.name === "string" ? dex.name : "",
+      liquidity: typeof dex.liquidity === "string" ? dex.liquidity : "",
+      volume: typeof dex.volume === "string" ? dex.volume : "",
+      routes: Number(dex.routes) || 0,
+      performance: typeof dex.performance === "string" ? dex.performance : "",
+    })) : [],
+    executionReadiness: source.executionReadiness ? {
+      readyPairs: Number(source.executionReadiness.readyPairs) || 0,
+      pendingPairs: Number(source.executionReadiness.pendingPairs) || 0,
+      coverage: typeof source.executionReadiness.coverage === "string" ? source.executionReadiness.coverage : "0%",
+      perDex: Array.isArray(source.executionReadiness.perDex) ? source.executionReadiness.perDex.map((item) => ({
+        dex: typeof item.dex === "string" ? item.dex : "",
+        ready: Number(item.ready) || 0,
+        pending: Number(item.pending) || 0,
+        coverage: typeof item.coverage === "string" ? item.coverage : "0%",
+      })) : [],
+      pairs: Array.isArray(source.executionReadiness.pairs) ? source.executionReadiness.pairs.map((item) => ({
+        id: typeof item.id === "string" ? item.id : "",
+        dex: typeof item.dex === "string" ? item.dex : "",
+        chain: typeof item.chain === "string" ? item.chain : "",
+        status: typeof item.status === "string" ? item.status : "pending",
+        version: typeof item.version === "string" ? item.version : undefined,
+        router: typeof item.router === "string" ? item.router : undefined,
+        factory: typeof item.factory === "string" ? item.factory : undefined,
+        reason: typeof item.reason === "string" ? item.reason : undefined,
+        category: typeof item.category === "string" ? item.category : undefined,
+        coverageHint: typeof item.coverageHint === "string" ? item.coverageHint : undefined,
+      })) : [],
+    } : {
+      readyPairs: 0,
+      pendingPairs: 0,
+      coverage: "0%",
+      perDex: [],
+      pairs: [],
+    },
+    tradeHistory: Array.isArray(source.tradeHistory) ? source.tradeHistory.map((trade) => ({
+      id: typeof trade.id === "string" ? trade.id : "",
+      pair: typeof trade.pair === "string" ? trade.pair : "",
+      route: typeof trade.route === "string" ? trade.route : "",
+      executedAt: typeof trade.executedAt === "string" ? trade.executedAt : "",
+      sizeUsd: typeof trade.sizeUsd === "string" ? trade.sizeUsd : "",
+      pnl: typeof trade.pnl === "string" ? trade.pnl : "",
+      status: typeof trade.status === "string" ? trade.status : "executed",
+      txHash: typeof trade.txHash === "string" ? trade.txHash : undefined,
+      note: typeof trade.note === "string" ? trade.note : undefined,
+    })) : [],
+    executionIntents: Array.isArray(source.executionIntents) ? source.executionIntents.map((intent) => ({
+      id: typeof intent.id === "string" ? intent.id : "",
+      chain: typeof intent.chain === "string" ? intent.chain : "",
+      walletAddress: typeof intent.walletAddress === "string" ? intent.walletAddress : "",
+      route: typeof intent.route === "string" ? intent.route : "",
+      amountUsd: typeof intent.amountUsd === "string" ? intent.amountUsd : "$0",
+      createdAt: typeof intent.createdAt === "string" ? intent.createdAt : "",
+      expiresAt: typeof intent.expiresAt === "string" ? intent.expiresAt : "",
+      status: typeof intent.status === "string" ? intent.status : "prepared",
+      privateRelayRequested: typeof intent.privateRelayRequested === "boolean" ? intent.privateRelayRequested : undefined,
+      privateRelayRequired: typeof intent.privateRelayRequired === "boolean" ? intent.privateRelayRequired : undefined,
+      relayHashes: Array.isArray(intent.relayHashes) ? intent.relayHashes.filter((hash): hash is string => typeof hash === "string") : undefined,
+      txHash: typeof intent.txHash === "string" ? intent.txHash : undefined,
+    })) : [],
+    executionIntentSummary: source.executionIntentSummary ? {
+      total: Number(source.executionIntentSummary.total) || 0,
+      prepared: Number(source.executionIntentSummary.prepared) || 0,
+      submitted: Number(source.executionIntentSummary.submitted) || 0,
+      confirmed: Number(source.executionIntentSummary.confirmed) || 0,
+      failed: Number(source.executionIntentSummary.failed) || 0,
+      active: Number(source.executionIntentSummary.active) || 0,
+    } : {
+      total: 0,
+      prepared: 0,
+      submitted: 0,
+      confirmed: 0,
+      failed: 0,
+      active: 0,
+    },
+    pnlSummary: source.pnlSummary ? {
+      totalPnl: typeof source.pnlSummary.totalPnl === "string" ? source.pnlSummary.totalPnl : "$0",
+      winRate: typeof source.pnlSummary.winRate === "string" ? source.pnlSummary.winRate : "0%",
+      totalVolume: typeof source.pnlSummary.totalVolume === "string" ? source.pnlSummary.totalVolume : "$0",
+      bestTrade: typeof source.pnlSummary.bestTrade === "string" ? source.pnlSummary.bestTrade : "$0",
+    } : {
+      totalPnl: "$0",
+      winRate: "0%",
+      totalVolume: "$0",
+      bestTrade: "$0",
+    },
+    quoteHealth: Array.isArray(source.quoteHealth) ? source.quoteHealth.map((row) => ({
+      dex: typeof row.dex === "string" ? row.dex : "",
+      dexId: typeof row.dexId === "string" ? row.dexId : "",
+      chain: typeof row.chain === "string" ? row.chain : "",
+      protocol: typeof row.protocol === "string" ? row.protocol : "",
+      priceSource: typeof row.priceSource === "string" ? row.priceSource : "",
+      quoteSource: typeof row.quoteSource === "string" ? row.quoteSource : "",
+      status: typeof row.status === "string" ? row.status : "UNVERIFIED",
+      source: typeof row.source === "string" ? row.source : "",
+      lastSuccessfulFetch: typeof row.lastSuccessfulFetch === "string" ? row.lastSuccessfulFetch : undefined,
+      quoteAgeMs: typeof row.quoteAgeMs === "number" ? row.quoteAgeMs : undefined,
+      blockNumber: typeof row.blockNumber === "number" ? row.blockNumber : undefined,
+      blockAge: typeof row.blockAge === "number" ? row.blockAge : undefined,
+      poolAddress: typeof row.poolAddress === "string" ? row.poolAddress : undefined,
+      liquidity: typeof row.liquidity === "string" ? row.liquidity : undefined,
+      error: typeof row.error === "string" ? row.error : undefined,
+      latencyMs: typeof row.latencyMs === "number" ? row.latencyMs : undefined,
+    })) : [],
+    dexSupportMatrix: Array.isArray(source.dexSupportMatrix) ? source.dexSupportMatrix.map((row) => ({
+      dex: typeof row.dex === "string" ? row.dex : "",
+      chain: typeof row.chain === "string" ? row.chain : "",
+      protocol: typeof row.protocol === "string" ? row.protocol : "",
+      priceSource: typeof row.priceSource === "string" ? row.priceSource : "",
+      quoteSource: typeof row.quoteSource === "string" ? row.quoteSource : "",
+      status: typeof row.status === "string" ? row.status : "UNVERIFIED",
+      lastSuccessfulQuote: typeof row.lastSuccessfulQuote === "string" ? row.lastSuccessfulQuote : undefined,
+    })) : [],
+    tokenMonitoring: Array.isArray(source.tokenMonitoring) ? source.tokenMonitoring.map((token) => ({
+      symbol: typeof token.symbol === "string" ? token.symbol : "",
+      price: typeof token.price === "string" ? token.price : "",
+      liquidity: typeof token.liquidity === "string" ? token.liquidity : "",
+      volume: typeof token.volume === "string" ? token.volume : "",
+      risk: typeof token.risk === "string" ? token.risk : "Low",
+    })) : [],
+    aiMetrics: Array.isArray(source.aiMetrics) ? source.aiMetrics.map((metric) => ({
+      label: typeof metric.label === "string" ? metric.label : "",
+      value: typeof metric.value === "string" ? metric.value : "",
+    })) : [],
+    executionPlan: Array.isArray(source.executionPlan) ? source.executionPlan.map((step) => ({
+      label: typeof step.label === "string" ? step.label : "",
+      detail: typeof step.detail === "string" ? step.detail : "",
+      status: typeof step.status === "string" ? step.status : "watch",
+    })) : [],
+    transactions: Array.isArray(source.transactions) ? source.transactions.map((tx) => ({
+      status: typeof tx.status === "string" ? tx.status : "",
+      hash: typeof tx.hash === "string" ? tx.hash : "",
+      gasUsed: typeof tx.gasUsed === "string" ? tx.gasUsed : "",
+    })) : [],
+    signerPolicy: source.signerPolicy ? {
+      mode: typeof source.signerPolicy.mode === "string" ? source.signerPolicy.mode : "wallet-external",
+      ready: Boolean(source.signerPolicy.ready),
+      production: Boolean(source.signerPolicy.production),
+      usingServerKey: Boolean(source.signerPolicy.usingServerKey),
+      kmsConfigured: Boolean(source.signerPolicy.kmsConfigured),
+      reason: typeof source.signerPolicy.reason === "string" ? source.signerPolicy.reason : "Signer policy status unavailable.",
+    } : {
+      mode: "wallet-external",
+      ready: true,
+      production: false,
+      usingServerKey: false,
+      kmsConfigured: false,
+      reason: "External wallet signer mode is active.",
+    },
+    capitalPolicy: source.capitalPolicy ? {
+      activeAllocationShare: Number(source.capitalPolicy.activeAllocationShare) || 0.6,
+      reserveAllocationShare: Number(source.capitalPolicy.reserveAllocationShare) || 0.25,
+      emergencyAllocationShare: Number(source.capitalPolicy.emergencyAllocationShare) || 0.15,
+      emergencyReserveFloorUsd: Number(source.capitalPolicy.emergencyReserveFloorUsd) || 150,
+      maxTradeShareOfActiveCapital: Number(source.capitalPolicy.maxTradeShareOfActiveCapital) || 0.35,
+      minGasReserveNative: source.capitalPolicy.minGasReserveNative
+        && typeof source.capitalPolicy.minGasReserveNative === "object"
+        && !Array.isArray(source.capitalPolicy.minGasReserveNative)
+        ? Object.fromEntries(
+          Object.entries(source.capitalPolicy.minGasReserveNative)
+            .filter(([, value]) => Number.isFinite(Number(value)))
+            .map(([chain, value]) => [chain, Number(value)]),
+        )
+        : {},
+    } : {
+      activeAllocationShare: 0.6,
+      reserveAllocationShare: 0.25,
+      emergencyAllocationShare: 0.15,
+      emergencyReserveFloorUsd: 150,
+      maxTradeShareOfActiveCapital: 0.35,
+      minGasReserveNative: {},
+    },
+    canaryValidation: source.canaryValidation ? {
+      chain: typeof source.canaryValidation.chain === "string" ? source.canaryValidation.chain : "arbitrum",
+      windowHours: Number(source.canaryValidation.windowHours) || 24,
+      minSettledTrades: Number(source.canaryValidation.minSettledTrades) || 3,
+      minRealizedNetUsd: Number(source.canaryValidation.minRealizedNetUsd) || 1,
+      maxAverageSlippageBps: Number(source.canaryValidation.maxAverageSlippageBps) || 35,
+      maxLossTrades: Number(source.canaryValidation.maxLossTrades) || 1,
+      settledTrades: Number(source.canaryValidation.settledTrades) || 0,
+      lossTrades: Number(source.canaryValidation.lossTrades) || 0,
+      cumulativeRealizedNetUsd: Number(source.canaryValidation.cumulativeRealizedNetUsd) || 0,
+      averageSlippageBps: Number(source.canaryValidation.averageSlippageBps) || 0,
+      goForScale: Boolean(source.canaryValidation.goForScale),
+      reason: typeof source.canaryValidation.reason === "string" ? source.canaryValidation.reason : "No canary validation data yet.",
+      latestSettledAt: typeof source.canaryValidation.latestSettledAt === "string" ? source.canaryValidation.latestSettledAt : undefined,
+    } : {
+      chain: "arbitrum",
+      windowHours: 24,
+      minSettledTrades: 3,
+      minRealizedNetUsd: 1,
+      maxAverageSlippageBps: 35,
+      maxLossTrades: 1,
+      settledTrades: 0,
+      lossTrades: 0,
+      cumulativeRealizedNetUsd: 0,
+      averageSlippageBps: 0,
+      goForScale: false,
+      reason: "No canary validation data yet.",
+      latestSettledAt: undefined,
+    },
+    relayRpcDrill: source.relayRpcDrill ? {
+      generatedAt: typeof source.relayRpcDrill.generatedAt === "string" ? source.relayRpcDrill.generatedAt : new Date().toISOString(),
+      relay: {
+        requiredChains: Array.isArray(source.relayRpcDrill.relay?.requiredChains) ? source.relayRpcDrill.relay.requiredChains.filter((row): row is string => typeof row === "string") : [],
+        configuredChains: Array.isArray(source.relayRpcDrill.relay?.configuredChains) ? source.relayRpcDrill.relay.configuredChains.filter((row): row is string => typeof row === "string") : [],
+        missingChains: Array.isArray(source.relayRpcDrill.relay?.missingChains) ? source.relayRpcDrill.relay.missingChains.filter((row): row is string => typeof row === "string") : [],
+        pass: Boolean(source.relayRpcDrill.relay?.pass),
+      },
+      rpc: {
+        totalChains: Number(source.relayRpcDrill.rpc?.totalChains) || 0,
+        degradedOrOfflineChains: Array.isArray(source.relayRpcDrill.rpc?.degradedOrOfflineChains) ? source.relayRpcDrill.rpc.degradedOrOfflineChains.filter((row): row is string => typeof row === "string") : [],
+        lowRedundancyChains: Array.isArray(source.relayRpcDrill.rpc?.lowRedundancyChains) ? source.relayRpcDrill.rpc.lowRedundancyChains.filter((row): row is string => typeof row === "string") : [],
+        pass: Boolean(source.relayRpcDrill.rpc?.pass),
+      },
+      failClosed: {
+        apiKeyConfigured: Boolean(source.relayRpcDrill.failClosed?.apiKeyConfigured),
+        unsafeBypassEnabled: Boolean(source.relayRpcDrill.failClosed?.unsafeBypassEnabled),
+        signerReady: Boolean(source.relayRpcDrill.failClosed?.signerReady),
+        pass: Boolean(source.relayRpcDrill.failClosed?.pass),
+      },
+      alerts: {
+        webhookConfigured: Boolean(source.relayRpcDrill.alerts?.webhookConfigured),
+        pass: Boolean(source.relayRpcDrill.alerts?.pass),
+      },
+      workers: {
+        recoveryEnabled: Boolean(source.relayRpcDrill.workers?.recoveryEnabled),
+        settlementEnabled: Boolean(source.relayRpcDrill.workers?.settlementEnabled),
+        pass: Boolean(source.relayRpcDrill.workers?.pass),
+      },
+      overallPass: Boolean(source.relayRpcDrill.overallPass),
+      reason: typeof source.relayRpcDrill.reason === "string" ? source.relayRpcDrill.reason : "Relay/RPC drill has not run yet.",
+    } : {
+      generatedAt: new Date().toISOString(),
+      relay: {
+        requiredChains: [],
+        configuredChains: [],
+        missingChains: [],
+        pass: false,
+      },
+      rpc: {
+        totalChains: 0,
+        degradedOrOfflineChains: [],
+        lowRedundancyChains: [],
+        pass: false,
+      },
+      failClosed: {
+        apiKeyConfigured: false,
+        unsafeBypassEnabled: false,
+        signerReady: true,
+        pass: false,
+      },
+      alerts: {
+        webhookConfigured: false,
+        pass: false,
+      },
+      workers: {
+        recoveryEnabled: false,
+        settlementEnabled: false,
+        pass: false,
+      },
+      overallPass: false,
+      reason: "Relay/RPC drill has not run yet.",
+    },
+    liveCostTuning: source.liveCostTuning ? {
+      windowTrades: Number(source.liveCostTuning.windowTrades) || 0,
+      avgGasCostUsd: Number(source.liveCostTuning.avgGasCostUsd) || 0,
+      avgSlippageBps: Number(source.liveCostTuning.avgSlippageBps) || 0,
+      avgRealizedNetUsd: Number(source.liveCostTuning.avgRealizedNetUsd) || 0,
+      gasCostBufferUsd: Number(source.liveCostTuning.gasCostBufferUsd) || 0,
+      slippageMultiplier: Number(source.liveCostTuning.slippageMultiplier) || 1,
+      sizingPenaltyMultiplier: Number(source.liveCostTuning.sizingPenaltyMultiplier) || 1,
+      reason: typeof source.liveCostTuning.reason === "string" ? source.liveCostTuning.reason : "No settled trades yet; live cost tuning is neutral.",
+    } : {
+      windowTrades: 0,
+      avgGasCostUsd: 0,
+      avgSlippageBps: 0,
+      avgRealizedNetUsd: 0,
+      gasCostBufferUsd: 0,
+      slippageMultiplier: 1,
+      sizingPenaltyMultiplier: 1,
+      reason: "No settled trades yet; live cost tuning is neutral.",
+    },
+    readinessGate: source.readinessGate ? {
+      generatedAt: typeof source.readinessGate.generatedAt === "string" ? source.readinessGate.generatedAt : new Date().toISOString(),
+      enforced: {
+        canaryPassRequired: Boolean(source.readinessGate.enforced?.canaryPassRequired),
+        relayRpcDrillPassRequired: Boolean(source.readinessGate.enforced?.relayRpcDrillPassRequired),
+      },
+      checks: {
+        killSwitchClear: Boolean(source.readinessGate.checks?.killSwitchClear),
+        signerReady: Boolean(source.readinessGate.checks?.signerReady),
+        canaryPass: Boolean(source.readinessGate.checks?.canaryPass),
+        relayRpcDrillPass: Boolean(source.readinessGate.checks?.relayRpcDrillPass),
+      },
+      pass: Boolean(source.readinessGate.pass),
+      reason: typeof source.readinessGate.reason === "string" ? source.readinessGate.reason : "Execution readiness gate status unavailable.",
+    } : {
+      generatedAt: new Date().toISOString(),
+      enforced: {
+        canaryPassRequired: false,
+        relayRpcDrillPassRequired: false,
+      },
+      checks: {
+        killSwitchClear: true,
+        signerReady: true,
+        canaryPass: false,
+        relayRpcDrillPass: false,
+      },
+      pass: true,
+      reason: "Execution readiness gate is advisory-only (enforcement disabled).",
+    },
+    readinessGateHistory: Array.isArray(source.readinessGateHistory)
+      ? source.readinessGateHistory
+        .filter((row) => Boolean(row && typeof row === "object" && !Array.isArray(row)))
+        .map((row) => {
+          const entry = row as Record<string, unknown>;
+          return {
+            generatedAt: typeof entry.generatedAt === "string" ? entry.generatedAt : new Date().toISOString(),
+            pass: Boolean(entry.pass),
+            reason: typeof entry.reason === "string" ? entry.reason : "Execution readiness gate status unavailable.",
+          };
+        })
+      : [],
+    operatorSafety: source.operatorSafety ? {
+      generatedAt: typeof source.operatorSafety.generatedAt === "string" ? source.operatorSafety.generatedAt : new Date().toISOString(),
+      persistence: {
+        filePath: typeof source.operatorSafety.persistence?.filePath === "string" ? source.operatorSafety.persistence.filePath : "",
+        exists: Boolean(source.operatorSafety.persistence?.exists),
+        healthy: Boolean(source.operatorSafety.persistence?.healthy),
+        sizeBytes: Number(source.operatorSafety.persistence?.sizeBytes) || 0,
+        lastModifiedAt: typeof source.operatorSafety.persistence?.lastModifiedAt === "string" ? source.operatorSafety.persistence.lastModifiedAt : undefined,
+      },
+      alerting: {
+        webhookConfigured: Boolean(source.operatorSafety.alerting?.webhookConfigured),
+        pass: Boolean(source.operatorSafety.alerting?.pass),
+      },
+      risk: {
+        killSwitchEngaged: Boolean(source.operatorSafety.risk?.killSwitchEngaged),
+        readinessGatePass: Boolean(source.operatorSafety.risk?.readinessGatePass),
+        canaryPass: Boolean(source.operatorSafety.risk?.canaryPass),
+        relayRpcDrillPass: Boolean(source.operatorSafety.risk?.relayRpcDrillPass),
+        pass: Boolean(source.operatorSafety.risk?.pass),
+      },
+      overallPass: Boolean(source.operatorSafety.overallPass),
+      reason: typeof source.operatorSafety.reason === "string" ? source.operatorSafety.reason : "Operator safety snapshot has not run yet.",
+    } : {
+      generatedAt: new Date().toISOString(),
+      persistence: {
+        filePath: "",
+        exists: false,
+        healthy: false,
+        sizeBytes: 0,
+        lastModifiedAt: undefined,
+      },
+      alerting: {
+        webhookConfigured: false,
+        pass: false,
+      },
+      risk: {
+        killSwitchEngaged: false,
+        readinessGatePass: true,
+        canaryPass: false,
+        relayRpcDrillPass: false,
+        pass: false,
+      },
+      overallPass: false,
+      reason: "Operator safety snapshot has not run yet.",
+    },
+    alerting: source.alerting ? {
+      webhookConfigured: Boolean(source.alerting.webhookConfigured),
+      unresolvedCritical: Number(source.alerting.unresolvedCritical) || 0,
+      recent: Array.isArray(source.alerting.recent)
+        ? source.alerting.recent.map((entry) => ({
+            id: typeof entry.id === "string" ? entry.id : "",
+            event: typeof entry.event === "string" ? entry.event : "",
+            message: typeof entry.message === "string" ? entry.message : "",
+            timestamp: typeof entry.timestamp === "string" ? entry.timestamp : new Date().toISOString(),
+            severity: entry.severity === "critical" || entry.severity === "warning" ? entry.severity : "info",
+            delivered: Boolean(entry.delivered),
+            reason: typeof entry.reason === "string" ? entry.reason : "",
+            responseAction: typeof entry.responseAction === "string" ? entry.responseAction : "review-notification",
+            acknowledged: Boolean(entry.acknowledged),
+            acknowledgedAt: typeof entry.acknowledgedAt === "string" ? entry.acknowledgedAt : undefined,
+            acknowledgedBy: typeof entry.acknowledgedBy === "string" ? entry.acknowledgedBy : undefined,
+            status: entry.status === "acknowledged" || entry.status === "failed" || entry.status === "delivered" ? entry.status : "delivered",
+          }))
+        : [],
+      recommendedActions: Array.isArray(source.alerting.recommendedActions)
+        ? source.alerting.recommendedActions.filter((action): action is string => typeof action === "string")
+        : [],
+      lastDeliveredAt: typeof source.alerting.lastDeliveredAt === "string" ? source.alerting.lastDeliveredAt : undefined,
+      lastFailedAt: typeof source.alerting.lastFailedAt === "string" ? source.alerting.lastFailedAt : undefined,
+    } : {
+      webhookConfigured: false,
+      unresolvedCritical: 0,
+      recent: [],
+      recommendedActions: [],
+    },
+    deploymentSafety: source.deploymentSafety ? {
+      generatedAt: typeof source.deploymentSafety.generatedAt === "string" ? source.deploymentSafety.generatedAt : new Date().toISOString(),
+      process: {
+        pid: Number(source.deploymentSafety.process?.pid) || 0,
+        uptimeSeconds: Number(source.deploymentSafety.process?.uptimeSeconds) || 0,
+        startedAt: typeof source.deploymentSafety.process?.startedAt === "string" ? source.deploymentSafety.process.startedAt : new Date().toISOString(),
+        nodeVersion: typeof source.deploymentSafety.process?.nodeVersion === "string" ? source.deploymentSafety.process.nodeVersion : "unknown",
+      },
+      persistence: {
+        filePath: typeof source.deploymentSafety.persistence?.filePath === "string" ? source.deploymentSafety.persistence.filePath : "",
+        exists: Boolean(source.deploymentSafety.persistence?.exists),
+        healthy: Boolean(source.deploymentSafety.persistence?.healthy),
+        sizeBytes: Number(source.deploymentSafety.persistence?.sizeBytes) || 0,
+        lastModifiedAt: typeof source.deploymentSafety.persistence?.lastModifiedAt === "string" ? source.deploymentSafety.persistence.lastModifiedAt : undefined,
+      },
+      workers: {
+        recovery: {
+          enabled: Boolean(source.deploymentSafety.workers?.recovery?.enabled),
+          inFlight: Boolean(source.deploymentSafety.workers?.recovery?.inFlight),
+          pending: Number(source.deploymentSafety.workers?.recovery?.pending) || 0,
+          retryReady: Number(source.deploymentSafety.workers?.recovery?.retryReady) || 0,
+        },
+        settlement: {
+          enabled: Boolean(source.deploymentSafety.workers?.settlement?.enabled),
+          inFlight: Boolean(source.deploymentSafety.workers?.settlement?.inFlight),
+          pending: Number(source.deploymentSafety.workers?.settlement?.pending) || 0,
+          retryReady: Number(source.deploymentSafety.workers?.settlement?.retryReady) || 0,
+        },
+      },
+      alerts: {
+        webhookConfigured: Boolean(source.deploymentSafety.alerts?.webhookConfigured),
+      },
+      restart: {
+        safeToRestart: Boolean(source.deploymentSafety.restart?.safeToRestart),
+        blockers: Array.isArray(source.deploymentSafety.restart?.blockers)
+          ? source.deploymentSafety.restart.blockers.filter((blocker): blocker is string => typeof blocker === "string")
+          : [],
+        reason: typeof source.deploymentSafety.restart?.reason === "string" ? source.deploymentSafety.restart.reason : "Deployment restart safety snapshot unavailable.",
+      },
+    } : {
+      generatedAt: new Date().toISOString(),
+      process: {
+        pid: 0,
+        uptimeSeconds: 0,
+        startedAt: new Date().toISOString(),
+        nodeVersion: "unknown",
+      },
+      persistence: {
+        filePath: "",
+        exists: false,
+        healthy: false,
+        sizeBytes: 0,
+        lastModifiedAt: undefined,
+      },
+      workers: {
+        recovery: {
+          enabled: false,
+          inFlight: false,
+          pending: 0,
+          retryReady: 0,
+        },
+        settlement: {
+          enabled: false,
+          inFlight: false,
+          pending: 0,
+          retryReady: 0,
+        },
+      },
+      alerts: {
+        webhookConfigured: false,
+      },
+      restart: {
+        safeToRestart: false,
+        blockers: [],
+        reason: "Deployment restart safety snapshot has not run yet.",
+      },
+    },
+    reconciliation: source.reconciliation ? {
+      generatedAt: typeof source.reconciliation.generatedAt === "string" ? source.reconciliation.generatedAt : new Date().toISOString(),
+      matched: Number(source.reconciliation.matched) || 0,
+      pending: Number(source.reconciliation.pending) || 0,
+      orphanSettlements: Number(source.reconciliation.orphanSettlements) || 0,
+      recentIssues: Array.isArray(source.reconciliation.recentIssues)
+        ? source.reconciliation.recentIssues.map((issue) => ({
+            type: issue.type === "orphan-settlement" ? "orphan-settlement" : "missing-settlement",
+            txHash: typeof issue.txHash === "string" ? issue.txHash : "",
+            chain: typeof issue.chain === "string" ? issue.chain : undefined,
+            note: typeof issue.note === "string" ? issue.note : "Post-trade reconciliation issue.",
+          }))
+        : [],
+      reason: typeof source.reconciliation.reason === "string" ? source.reconciliation.reason : "Post-trade reconciliation snapshot unavailable.",
+    } : {
+      generatedAt: new Date().toISOString(),
+      matched: 0,
+      pending: 0,
+      orphanSettlements: 0,
+      recentIssues: [],
+      reason: "Post-trade reconciliation snapshot has not run yet.",
+    },
+    opsMetricsGeneratedAt: typeof source.opsMetricsGeneratedAt === "string" ? source.opsMetricsGeneratedAt : undefined,
+    killSwitch: source.killSwitch ? {
+      engaged: Boolean(source.killSwitch.engaged),
+      reason: typeof source.killSwitch.reason === "string" ? source.killSwitch.reason : undefined,
+      engagedAt: typeof source.killSwitch.engagedAt === "string" ? source.killSwitch.engagedAt : undefined,
+      consecutiveLosses: Number(source.killSwitch.consecutiveLosses) || 0,
+      abnormalSlippageEvents: Number(source.killSwitch.abnormalSlippageEvents) || 0,
+      rpcInstabilityEvents: Number(source.killSwitch.rpcInstabilityEvents) || 0,
+      dailyRealizedLossUsd: Number(source.killSwitch.dailyRealizedLossUsd) || 0,
+    } : {
+      engaged: false,
+      reason: undefined,
+      engagedAt: undefined,
+      consecutiveLosses: 0,
+      abnormalSlippageEvents: 0,
+      rpcInstabilityEvents: 0,
+      dailyRealizedLossUsd: 0,
+    },
+    replay: source.replay ? {
+      windowMinutes: Number(source.replay.windowMinutes) || 60,
+      scanned: Number(source.replay.scanned) || 0,
+      executable: Number(source.replay.executable) || 0,
+      avgExpectedNetUsd: Number(source.replay.avgExpectedNetUsd) || 0,
+    } : {
+      windowMinutes: 60,
+      scanned: 0,
+      executable: 0,
+      avgExpectedNetUsd: 0,
+    },
+    rpc: source.rpc ? {
+      degradedOrOfflineChains: Array.isArray(source.rpc.degradedOrOfflineChains)
+        ? source.rpc.degradedOrOfflineChains.filter((chain): chain is string => typeof chain === "string")
+        : [],
+    } : {
+      degradedOrOfflineChains: [],
+    },
+    persistence: source.persistence ? {
+      storePath: typeof source.persistence.storePath === "string" ? source.persistence.storePath : undefined,
+    } : {
+      storePath: undefined,
+    },
+    recoveryWorker: source.recoveryWorker ? {
+      enabled: Boolean(source.recoveryWorker.enabled),
+      inFlight: Boolean(source.recoveryWorker.inFlight),
+      intervalMs: Number(source.recoveryWorker.intervalMs) || 0,
+      maxAttempts: Number(source.recoveryWorker.maxAttempts) || 0,
+      baseBackoffMs: Number(source.recoveryWorker.baseBackoffMs) || 0,
+      maxBackoffMs: Number(source.recoveryWorker.maxBackoffMs) || 0,
+      defaultSlippageBps: Number(source.recoveryWorker.defaultSlippageBps) || 0,
+      pending: Number(source.recoveryWorker.pending) || 0,
+      retryReady: Number(source.recoveryWorker.retryReady) || 0,
+      lastRunAt: typeof source.recoveryWorker.lastRunAt === "string" ? source.recoveryWorker.lastRunAt : undefined,
+    } : {
+      enabled: false,
+      inFlight: false,
+      intervalMs: 0,
+      maxAttempts: 0,
+      baseBackoffMs: 0,
+      maxBackoffMs: 0,
+      defaultSlippageBps: 0,
+      pending: 0,
+      retryReady: 0,
+      lastRunAt: undefined,
+    },
+    settlementWorker: source.settlementWorker ? {
+      enabled: Boolean(source.settlementWorker.enabled),
+      inFlight: Boolean(source.settlementWorker.inFlight),
+      intervalMs: Number(source.settlementWorker.intervalMs) || 0,
+      maxAttempts: Number(source.settlementWorker.maxAttempts) || 0,
+      baseBackoffMs: Number(source.settlementWorker.baseBackoffMs) || 0,
+      maxBackoffMs: Number(source.settlementWorker.maxBackoffMs) || 0,
+      minProfitBps: Number(source.settlementWorker.minProfitBps) || 0,
+      pending: Number(source.settlementWorker.pending) || 0,
+      retryReady: Number(source.settlementWorker.retryReady) || 0,
+      lastRunAt: typeof source.settlementWorker.lastRunAt === "string" ? source.settlementWorker.lastRunAt : undefined,
+    } : {
+      enabled: false,
+      inFlight: false,
+      intervalMs: 0,
+      maxAttempts: 0,
+      baseBackoffMs: 0,
+      maxBackoffMs: 0,
+      minProfitBps: 0,
+      pending: 0,
+      retryReady: 0,
+      lastRunAt: undefined,
+    },
+    settlementQueue: source.settlementQueue ? {
+      pending: Number(source.settlementQueue.pending) || 0,
+      settled: Number(source.settlementQueue.settled) || 0,
+      failed: Number(source.settlementQueue.failed) || 0,
+      items: Array.isArray(source.settlementQueue.items) ? source.settlementQueue.items.map((item) => ({
+        id: typeof item.id === "string" ? item.id : "",
+        txHash: typeof item.txHash === "string" ? item.txHash : "",
+        chain: typeof item.chain === "string" ? item.chain : "",
+        walletAddress: typeof item.walletAddress === "string" ? item.walletAddress : "",
+        amountUsd: typeof item.amountUsd === "string" ? item.amountUsd : "$0",
+        pair: typeof item.pair === "string" ? item.pair : undefined,
+        route: typeof item.route === "string" ? item.route : undefined,
+        status: typeof item.status === "string" ? item.status : "pending",
+        attempts: Number(item.attempts) || 0,
+        createdAt: typeof item.createdAt === "string" ? item.createdAt : "",
+        lastAttemptAt: typeof item.lastAttemptAt === "string" ? item.lastAttemptAt : undefined,
+        nextRetryAt: typeof item.nextRetryAt === "string" ? item.nextRetryAt : undefined,
+        lastError: typeof item.lastError === "string" ? item.lastError : undefined,
+        settledAt: typeof item.settledAt === "string" ? item.settledAt : undefined,
+      })) : [],
+    } : {
+      pending: 0,
+      settled: 0,
+      failed: 0,
+      items: [],
+    },
+    settlements: source.settlements ? {
+      count: Number(source.settlements.count) || 0,
+      latest: source.settlements.latest && typeof source.settlements.latest === "object" ? {
+        txHash: typeof source.settlements.latest.txHash === "string" ? source.settlements.latest.txHash : "",
+        chain: typeof source.settlements.latest.chain === "string" ? source.settlements.latest.chain : "",
+        walletAddress: typeof source.settlements.latest.walletAddress === "string" ? source.settlements.latest.walletAddress : "",
+        amountUsd: typeof source.settlements.latest.amountUsd === "string" ? source.settlements.latest.amountUsd : "$0",
+        pair: typeof source.settlements.latest.pair === "string" ? source.settlements.latest.pair : undefined,
+        route: typeof source.settlements.latest.route === "string" ? source.settlements.latest.route : undefined,
+        realizedNetUsd: typeof source.settlements.latest.realizedNetUsd === "string" ? source.settlements.latest.realizedNetUsd : "$0",
+        spreadGainUsd: typeof source.settlements.latest.spreadGainUsd === "string" ? source.settlements.latest.spreadGainUsd : "$0",
+        gasCostUsd: typeof source.settlements.latest.gasCostUsd === "string" ? source.settlements.latest.gasCostUsd : "$0",
+        slippageCostUsd: typeof source.settlements.latest.slippageCostUsd === "string" ? source.settlements.latest.slippageCostUsd : "$0",
+        settledAt: typeof source.settlements.latest.settledAt === "string" ? source.settlements.latest.settledAt : "",
+        note: typeof source.settlements.latest.note === "string" ? source.settlements.latest.note : undefined,
+      } : undefined,
+    } : {
+      count: 0,
+      latest: undefined,
+    },
+    rollout: source.rollout ? {
+      summary: source.rollout.summary ? {
+        blocked: Number(source.rollout.summary.blocked) || 0,
+        canary: Number(source.rollout.summary.canary) || 0,
+        scale: Number(source.rollout.summary.scale) || 0,
+      } : {
+        blocked: 0,
+        canary: 0,
+        scale: 0,
+      },
+      governance: source.rollout.governance ? {
+        autopilotEnabled: Boolean(source.rollout.governance.autopilotEnabled),
+        promotionStreakRequired: Number(source.rollout.governance.promotionStreakRequired) || 3,
+        promotionCooldownMs: Number(source.rollout.governance.promotionCooldownMs) || 600000,
+        demotionCooldownMs: Number(source.rollout.governance.demotionCooldownMs) || 180000,
+      } : {
+        autopilotEnabled: true,
+        promotionStreakRequired: 3,
+        promotionCooldownMs: 600000,
+        demotionCooldownMs: 180000,
+      },
+      chains: Array.isArray(source.rollout.chains) ? source.rollout.chains.map((chain) => ({
+        chain: typeof chain.chain === "string" ? chain.chain : "",
+        stage: typeof chain.stage === "string" ? chain.stage : "blocked",
+        observedStage: typeof chain.observedStage === "string" ? chain.observedStage : undefined,
+        rpcOverall: typeof chain.rpcOverall === "string" ? chain.rpcOverall : "offline",
+        executablePairs: chain.executablePairs ? {
+          ready: Number(chain.executablePairs.ready) || 0,
+          total: Number(chain.executablePairs.total) || 0,
+          coveragePct: Number(chain.executablePairs.coveragePct) || 0,
+        } : {
+          ready: 0,
+          total: 0,
+          coveragePct: 0,
+        },
+        quoteHealth: chain.quoteHealth ? {
+          degradedOrOffline: Number(chain.quoteHealth.degradedOrOffline) || 0,
+        } : {
+          degradedOrOffline: 0,
+        },
+        canaryValidation: chain.canaryValidation ? {
+          chain: typeof chain.canaryValidation.chain === "string" ? chain.canaryValidation.chain : "arbitrum",
+          windowHours: Number(chain.canaryValidation.windowHours) || 24,
+          minSettledTrades: Number(chain.canaryValidation.minSettledTrades) || 3,
+          minRealizedNetUsd: Number(chain.canaryValidation.minRealizedNetUsd) || 1,
+          maxAverageSlippageBps: Number(chain.canaryValidation.maxAverageSlippageBps) || 35,
+          maxLossTrades: Number(chain.canaryValidation.maxLossTrades) || 1,
+          settledTrades: Number(chain.canaryValidation.settledTrades) || 0,
+          lossTrades: Number(chain.canaryValidation.lossTrades) || 0,
+          cumulativeRealizedNetUsd: Number(chain.canaryValidation.cumulativeRealizedNetUsd) || 0,
+          averageSlippageBps: Number(chain.canaryValidation.averageSlippageBps) || 0,
+          goForScale: Boolean(chain.canaryValidation.goForScale),
+          reason: typeof chain.canaryValidation.reason === "string" ? chain.canaryValidation.reason : "No canary validation data yet.",
+          latestSettledAt: typeof chain.canaryValidation.latestSettledAt === "string" ? chain.canaryValidation.latestSettledAt : undefined,
+        } : undefined,
+        readinessGate: chain.readinessGate ? {
+          generatedAt: typeof chain.readinessGate.generatedAt === "string" ? chain.readinessGate.generatedAt : new Date().toISOString(),
+          enforced: {
+            canaryPassRequired: Boolean(chain.readinessGate.enforced?.canaryPassRequired),
+            relayRpcDrillPassRequired: Boolean(chain.readinessGate.enforced?.relayRpcDrillPassRequired),
+          },
+          checks: {
+            killSwitchClear: Boolean(chain.readinessGate.checks?.killSwitchClear),
+            signerReady: Boolean(chain.readinessGate.checks?.signerReady),
+            canaryPass: Boolean(chain.readinessGate.checks?.canaryPass),
+            relayRpcDrillPass: Boolean(chain.readinessGate.checks?.relayRpcDrillPass),
+          },
+          pass: Boolean(chain.readinessGate.pass),
+          reason: typeof chain.readinessGate.reason === "string" ? chain.readinessGate.reason : "Execution readiness gate status unavailable.",
+        } : undefined,
+        operatorSafety: chain.operatorSafety ? {
+          generatedAt: typeof chain.operatorSafety.generatedAt === "string" ? chain.operatorSafety.generatedAt : new Date().toISOString(),
+          persistence: {
+            filePath: typeof chain.operatorSafety.persistence?.filePath === "string" ? chain.operatorSafety.persistence.filePath : "",
+            exists: Boolean(chain.operatorSafety.persistence?.exists),
+            healthy: Boolean(chain.operatorSafety.persistence?.healthy),
+            sizeBytes: Number(chain.operatorSafety.persistence?.sizeBytes) || 0,
+            lastModifiedAt: typeof chain.operatorSafety.persistence?.lastModifiedAt === "string" ? chain.operatorSafety.persistence.lastModifiedAt : undefined,
+          },
+          alerting: {
+            webhookConfigured: Boolean(chain.operatorSafety.alerting?.webhookConfigured),
+            pass: Boolean(chain.operatorSafety.alerting?.pass),
+          },
+          risk: {
+            killSwitchEngaged: Boolean(chain.operatorSafety.risk?.killSwitchEngaged),
+            readinessGatePass: Boolean(chain.operatorSafety.risk?.readinessGatePass),
+            canaryPass: Boolean(chain.operatorSafety.risk?.canaryPass),
+            relayRpcDrillPass: Boolean(chain.operatorSafety.risk?.relayRpcDrillPass),
+            pass: Boolean(chain.operatorSafety.risk?.pass),
+          },
+          overallPass: Boolean(chain.operatorSafety.overallPass),
+          reason: typeof chain.operatorSafety.reason === "string" ? chain.operatorSafety.reason : "Operator safety snapshot unavailable.",
+        } : undefined,
+        goNoGo: chain.goNoGo ? {
+          chain: typeof chain.goNoGo.chain === "string" ? chain.goNoGo.chain : "",
+          observedStage: typeof chain.goNoGo.observedStage === "string" ? chain.goNoGo.observedStage : "blocked",
+          recommendedStage: typeof chain.goNoGo.recommendedStage === "string" ? chain.goNoGo.recommendedStage : "blocked",
+          readyForCanary: Boolean(chain.goNoGo.readyForCanary),
+          readyForScale: Boolean(chain.goNoGo.readyForScale),
+          checks: {
+            readinessGatePass: Boolean(chain.goNoGo.checks?.readinessGatePass),
+            relayRpcDrillPass: Boolean(chain.goNoGo.checks?.relayRpcDrillPass),
+            operatorSafetyPass: Boolean(chain.goNoGo.checks?.operatorSafetyPass),
+            canaryValidationPass: Boolean(chain.goNoGo.checks?.canaryValidationPass),
+          },
+          reason: typeof chain.goNoGo.reason === "string" ? chain.goNoGo.reason : "Rollout gate unavailable.",
+        } : undefined,
+        governance: chain.governance ? {
+          source: typeof chain.governance.source === "string" ? chain.governance.source : undefined,
+          promotionStreak: Number(chain.governance.promotionStreak) || 0,
+          holdUntil: typeof chain.governance.holdUntil === "string" ? chain.governance.holdUntil : undefined,
+          lastTransitionAt: typeof chain.governance.lastTransitionAt === "string" ? chain.governance.lastTransitionAt : undefined,
+          manualOverrideStage: typeof chain.governance.manualOverrideStage === "string" ? chain.governance.manualOverrideStage : undefined,
+        } : undefined,
+        reason: typeof chain.reason === "string" ? chain.reason : undefined,
+      })) : [],
+    } : {
+      summary: {
+        blocked: 0,
+        canary: 0,
+        scale: 0,
+      },
+      governance: {
+        autopilotEnabled: true,
+        promotionStreakRequired: 3,
+        promotionCooldownMs: 600000,
+        demotionCooldownMs: 180000,
+      },
+      chains: [],
+    },
+    chartSummary: source.chartSummary ? {
+      profitHistory: Array.isArray(source.chartSummary.profitHistory) ? source.chartSummary.profitHistory.map((value) => Number(value) || 0) : [],
+      gasBars: Array.isArray(source.chartSummary.gasBars) ? source.chartSummary.gasBars.map((value) => Number(value) || 0) : [],
+      successRate: typeof source.chartSummary.successRate === "string" ? source.chartSummary.successRate : "0%",
+      opportunityTimeline: typeof source.chartSummary.opportunityTimeline === "string" ? source.chartSummary.opportunityTimeline : "0 active",
+    } : {
+      profitHistory: [],
+      gasBars: [],
+      successRate: "0%",
+      opportunityTimeline: "0 active",
+    },
+  };
+}
